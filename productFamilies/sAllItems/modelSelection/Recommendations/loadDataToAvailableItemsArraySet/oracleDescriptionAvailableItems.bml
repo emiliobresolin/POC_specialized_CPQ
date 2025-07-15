@@ -1,0 +1,59 @@
+typeFilter = productFamilyFilterNew ;
+yearFilter = modelYearFilterNew ;
+categoryFilter = categoryFilterNew ; 
+lengthOfArraySet = availableItemsArrayControllerAttr ;
+
+select = "Type,ModelName,Sku,ModelYear,OracleDesc,Color,OnHandInventory,BadgeEligible,SWorks";
+from = "SpecializedAllItems";
+where = "";
+lang = dict("string");
+fields = dict("string");
+isWhereAdded = false ;
+if(isnull(typeFilter) == false AND typeFilter <> "" AND upper(typeFilter) <> "NONE" AND upper(typeFilter) <> "NULL"){
+	where = " Type = $typeFilter " ;
+	put(fields,"$typeFilter",typeFilter);
+	isWhereAdded = True ;
+}
+
+if(isnull(categoryFilter) == false AND categoryFilter <> "" AND upper(categoryFilter) <> "NONE" AND upper(categoryFilter) <> "NULL"){
+	if(isWhereAdded){
+		where = where + "AND"+" Category = $categoryFilter " ;
+	}else{
+		where = " Category = $categoryFilter ";
+	}
+	put(fields,"$categoryFilter",categoryFilter);
+	isWhereAdded = True ;
+}
+
+if(isnull(yearFilter) == false AND yearFilter <> "" AND upper(yearFilter) <> "NONE" AND upper(yearFilter) <> "NULL"){
+	if(isWhereAdded){
+		where = where + "AND"+" ModelYear= $yearFilter " ;
+	}else{
+		where = " ModelYear= $yearFilter ";
+	}
+	put(fields,"$yearFilter",yearFilter);
+	isWhereAdded = True ;
+}
+
+results = recordSet() ;
+
+if(isnull(where) OR where == "" OR upper(where)=="NULL"){
+	results = bmql("select $select from $from" , lang, fields);
+}
+else{
+	results = bmql("select $select from $from where $where", lang, fields);
+}
+
+print(results);
+
+retStrArr = String[];
+idx = 0 ;
+for each in results{
+	if(idx >= 200){
+		break ;
+	}
+	append(retStrArr,get(each,"OracleDesc"));
+}
+
+
+return retStrArr ;

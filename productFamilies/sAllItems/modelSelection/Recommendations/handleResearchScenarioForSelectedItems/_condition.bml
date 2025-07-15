@@ -1,0 +1,4 @@
+if( (_action_addItems == true)){
+	return true;
+}
+return false;

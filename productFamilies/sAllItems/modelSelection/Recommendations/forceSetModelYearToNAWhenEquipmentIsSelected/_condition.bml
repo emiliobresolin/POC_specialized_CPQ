@@ -1,0 +1,4 @@
+if( (productFamilyFilterNew=="Equipment")){
+	return true;
+}
+return false;

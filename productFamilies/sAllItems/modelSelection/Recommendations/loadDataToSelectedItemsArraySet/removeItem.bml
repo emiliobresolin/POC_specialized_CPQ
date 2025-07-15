@@ -1,0 +1,8 @@
+retArr = boolean[];
+dummyArr = range(selectedItemsArrayControllerAttribute);
+
+for i in dummyArr{
+	append(retArr,False);
+}
+
+return retArr ;

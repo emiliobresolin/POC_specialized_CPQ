@@ -1,0 +1,25 @@
+selectedItemsDetails = jsonarray();
+if(isnull(selectedItemsString) == false AND selectedItemsString<> "" AND upper(selectedItemsString) <> "NONE" AND upper(selectedItemsString) <> "NULL"){
+	selectedItemsDetails = jsonarray(selectedItemsString);
+}
+skuArray = skuAvailableItems;
+dummyArr = range(availableItemsArrayControllerAttr);
+
+for i in dummyArr {
+	if(selectAvailableItems[i]==True OR quantityAvailableItems[i]>0){
+		qty = quantityAvailableItems[i] ;
+		if(qty == 0){
+			qty = 1 ;
+		}
+		
+		jsonItem = json();
+		jsonput(jsonItem ,"sku",skuArray[i]);
+		jsonput(jsonItem ,"modelName",modelNameAvailableModels[i]);
+		jsonput(jsonItem ,"quantity",qty);
+		jsonput(jsonItem ,"description",oracleDescriptionAvailableItems[i]);
+		jsonput(jsonItem ,"isAddedToSelectedItems",False);
+		jsonarrayappend(selectedItemsDetails ,jsonItem );
+	}
+}
+
+return jsonarraytostr(selectedItemsDetails);

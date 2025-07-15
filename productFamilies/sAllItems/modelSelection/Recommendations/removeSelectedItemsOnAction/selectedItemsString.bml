@@ -1,0 +1,20 @@
+selectedItemsDetails = jsonarray();
+if(isnull(selectedItemsString) == false AND selectedItemsString<> "" AND upper(selectedItemsString) <> "NONE" AND upper(selectedItemsString) <> "NULL"){
+	selectedItemsDetails = jsonarray(selectedItemsString);
+}
+newJsonArray = jsonarray();
+
+RemoveArray = removeItem;
+dummyArr = range(jsonarraysize(selectedItemsDetails));
+print(RemoveArray[0]);
+
+for i in dummyArr {
+	print(i);
+	if(RemoveArray[i]==True ){
+		continue ;
+	}
+	jsonItem = jsonarrayget(selectedItemsDetails,i,"json");
+	jsonarrayappend(newJsonArray,jsonItem);
+}
+
+return jsonarraytostr(newJsonArray);

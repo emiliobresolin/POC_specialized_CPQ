@@ -1,0 +1,4 @@
+selectedItemJsonArr = jsonarray(selectedItemsString);
+size = jsonarraysize(selectedItemJsonArr);
+
+return size ;

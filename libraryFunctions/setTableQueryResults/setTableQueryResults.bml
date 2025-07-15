@@ -1,0 +1,30 @@
+    retval="";
+myarray=string[];
+myfilter=modelFilter;
+mymodel=selectType;
+
+myquery=bmql("SELECT Type, ModelYear, Category, ModelName, OracleDesc, Color, Sku "+
+	     "FROM PrebookOrder WHERE Type = $mymodel AND Category = $myfilter");
+//myquery=bmql("SELECT Type, ModelYear, Category, ModelName, OracleDesc, Color, Sku FROM PrebookOrder");
+counter=1;  
+for each in myquery{
+	print each;
+	gettype=get(each,"Type");
+	getyear=get(each,"ModelYear");
+	getcategory=get(each,"Category");
+	getmodel=get(each,"ModelName");
+	getdesc=get(each,"OracleDesc");
+	getcolor=get(each,"Color");
+	getsku=get(each,"Sku");
+	if(gettype<>"" AND getyear<>"" AND getcategory<>"" AND getmodel<>"" AND getdesc<>"" AND getcolor<>"" AND getsku<>""){
+		retval=retval+"#"+string(counter)+"~"+gettype+"~"+getyear+"~"+getcategory+"~"+getmodel+"~"+getdesc+"~"+getcolor+"~"+getsku+"$$$";
+	}else{
+		retval="Data issue";
+	}
+	counter=counter+1;
+}
+if(retval <> "Data issue" AND substring(retval, len(retval) - 3) == "$$$"){
+    retval = substring(retval, 0, len(retval) - 3);
+}
+
+return retval;

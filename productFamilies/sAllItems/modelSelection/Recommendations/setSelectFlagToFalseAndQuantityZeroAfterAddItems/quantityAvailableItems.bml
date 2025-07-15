@@ -1,0 +1,8 @@
+retArr = Integer[];
+dummyArr = range(availableItemsArrayControllerAttr);
+
+for i in dummyArr{
+	append(retArr,0);
+}
+
+return retArr ;

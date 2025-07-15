@@ -1,0 +1,12 @@
+selectedItemJsonArr = jsonarray(selectedItemsString);
+size = jsonarraysize(selectedItemJsonArr);
+arr = range(size);
+retArr = Integer[];
+for i in arr{
+	itemJson = jsonarrayget(selectedItemJsonArr ,i,"json");
+	append(retArr,atoi(jsonget(itemJson,"quantity")));
+}
+
+return retArr ;
+
+

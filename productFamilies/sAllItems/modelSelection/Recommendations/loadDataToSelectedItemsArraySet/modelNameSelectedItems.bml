@@ -1,0 +1,10 @@
+selectedItemJsonArr = jsonarray(selectedItemsString);
+size = jsonarraysize(selectedItemJsonArr);
+arr = range(size);
+retArr = String[];
+for i in arr{
+	itemJson = jsonarrayget(selectedItemJsonArr ,i,"json");
+	append(retArr,jsonget(itemJson,"modelName"));
+}
+
+return retArr ;

@@ -1,0 +1,8 @@
+retArr = String[];
+dummyArr = range(selectedItemsArrayControllerAttribute);
+
+for i in dummyArr{
+	append(retArr,"100");
+}
+
+return retArr ;
