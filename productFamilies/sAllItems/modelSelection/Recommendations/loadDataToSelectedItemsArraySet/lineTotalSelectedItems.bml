@@ -1,0 +1,15 @@
+selectedItemJsonArr = jsonarray(selectedItemsString);
+size = jsonarraysize(selectedItemJsonArr);
+arr = range(size);
+retArr = String[];
+for i in arr{
+	itemJson = jsonarrayget(selectedItemJsonArr ,i,"json");
+	myprice=jsonget(itemJson,"price");
+	myqty=jsonget(itemJson,"quantity");
+	//print myprice;
+	//print myqty;
+	lineTotal=getcurrencyvalue(myprice,"USD")*atoi(myqty);
+	append(retArr,"$"+string(lineTotal));
+}
+
+return retArr ;
