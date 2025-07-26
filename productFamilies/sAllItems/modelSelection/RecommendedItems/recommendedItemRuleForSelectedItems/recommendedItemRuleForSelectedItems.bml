@@ -1,0 +1,116 @@
+selectedItemJsonArr = jsonarray(selectedItemsString);
+size = jsonarraysize(selectedItemJsonArr);
+arr = range(size);
+
+equipCategories = string[]{"BAG","FENDER","CHARGER","BASKET","BATTERY","CABLE","ACCESSORY"};
+
+// Totals by category
+bikeTotal = 0.0;
+equipmentTotal = 0.0;
+apparelTotal = 0.0;
+
+// Dictionaries to hold info per item
+typeMap = dict("string");     // sku -> "bike", "equipment", "apparel"
+priceMap = dict("float");     // sku -> unit price
+qtyMap = dict("integer");     // sku -> quantity
+nameMap = dict("string");     // sku -> model name
+
+// 1st pass: extract info and calculate totals per category
+for i in arr {
+  itemJson = jsonarrayget(selectedItemJsonArr, i, "json");
+  sku = jsonget(itemJson, "sku");
+  modelName = jsonget(itemJson, "modelName");
+  qty = atoi(jsonget(itemJson, "quantity"));
+  unitPrice = getcurrencyvalue(jsonget(itemJson, "price"), "USD"); // e.g. "$550.0"
+
+  // Save info
+  put(qtyMap, sku, qty);
+  put(nameMap, sku, modelName);
+  put(priceMap, sku, unitPrice);
+
+  // Get type
+  itemQuery = bmql("SELECT Type, Category FROM SpecializedAllItems WHERE Sku = $sku");
+  for row in itemQuery {
+    mytype = get(row, "Type");
+    category = get(row, "Category");
+
+    type = "";
+    if (mytype <> "Equipment") {
+      type = "bike";
+    } else {
+      if (findinarray(equipCategories, category) <> -1) {
+        type = "equipment";
+      } else {
+        type = "apparel";
+      }
+    }
+
+    put(typeMap, sku, type);
+
+    lineTotal = unitPrice * qty;
+    if (type == "bike") {
+      bikeTotal = bikeTotal + lineTotal;
+    } elif (type == "equipment") {
+      equipmentTotal = equipmentTotal + lineTotal;
+    } elif (type == "apparel") {
+      apparelTotal = apparelTotal + lineTotal;
+    }
+  }
+}
+
+// 2nd pass: Determine badge discount rates
+bikeRate = 0.0;
+equipmentRate = 0.0;
+apparelRate = 0.0;
+
+badgeQuery = bmql("SELECT identifier, name, amount, creditRate FROM BadgesTiers");
+for row in badgeQuery {
+  id = get(row, "identifier");
+  threshold = atof(get(row, "amount"));
+  rate = atof(get(row, "creditRate"));
+
+  if (id == "bike" and bikeTotal >= threshold and rate > bikeRate) {
+    bikeRate = rate;
+  } elif (id == "equipamentBadge" and equipmentTotal >= threshold and rate > equipmentRate) {
+    equipmentRate = rate;
+  } elif (id == "apparelBadge" and apparelTotal >= threshold and rate > apparelRate) {
+    apparelRate = rate;
+  }
+}
+
+// 3rd pass: Build return string with discounted unit prices
+result = "";
+
+for i in arr {
+  itemJson = jsonarrayget(selectedItemJsonArr, i, "json");
+  sku = jsonget(itemJson, "sku");
+  modelName = get(nameMap, sku);
+  qty = get(qtyMap, sku);
+  type = get(typeMap, sku);
+  unitPrice = get(priceMap, sku);
+
+  discountRate = 0.0;
+  if (type == "bike") {
+    discountRate = bikeRate;
+  } elif (type == "equipment") {
+    discountRate = equipmentRate;
+  } elif (type == "apparel") {
+    discountRate = apparelRate;
+  }
+
+  discountedUnitPrice = round(unitPrice * (1.0 - discountRate), 2);
+
+  line = sku + "~" + string(qty) + "~" + modelName + "~" + string(discountedUnitPrice);
+  if (type <> "") {
+    line = line + "~" + type;
+  }
+
+  result = result + line + "|^|";
+}
+
+// Clean up final string
+if (len(result) > 3) {
+  result = substring(result, 0, len(result) - 3);
+}
+
+return result;
